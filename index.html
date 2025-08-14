@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Service Sérénité</title>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+<div class="app">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="logo-circle">SS</div>
+      <div class="brand-text">
+        <div class="brand-title">SERVICE</div>
+        <div class="brand-sub">SÉRÉNITÉ</div>
+      </div>
+    </div>
+    <nav class="menu">
+      <button data-page="dashboard" class="active">Tableau de bord</button>
+      <button data-page="clients">Clients</button>
+      <button data-page="defunts">Défunts</button>
+      <button data-page="organismes">Organismes</button>
+      <button data-page="dossier">Dossier Défunt</button>
+      <button data-page="parametres">Paramètres</button>
+    </nav>
+  </aside>
+
+  <!-- Main -->
+  <main class="main">
+    <header class="topbar">
+      <div></div>
+      <button id="btnParams" title="Paramètres" class="icon-btn">⚙️</button>
+    </header>
+
+    <!-- Pages -->
+    <section id="page-dashboard" class="page">
+      <h2>Tableau de bord</h2>
+      <div class="cards">
+        <div class="card"><div class="card-title">Clients</div><div class="card-value" id="statClients">0</div></div>
+        <div class="card"><div class="card-title">Défunts</div><div class="card-value" id="statDefunts">0</div></div>
+        <div class="card"><div class="card-title">Organismes</div><div class="card-value" id="statOrganismes">0</div></div>
+      </div>
+    </section>
+
+    <section id="page-clients" class="page" style="display:none;">
+      <h2>Gestion des Clients</h2>
+      <form id="form-client" class="form-grid">
+        <input id="nomClient" placeholder="Nom" required />
+        <input id="prenomClient" placeholder="Prénom" required />
+        <input id="dateNaissanceClient" type="date" placeholder="Date de naissance" required />
+        <input id="adresseClient" placeholder="Adresse" />
+        <input id="telClient" placeholder="Téléphone" />
+        <input id="emailClient" type="email" placeholder="Email" />
+        <input id="ribClient" placeholder="RIB" />
+        <button class="btn-primary" type="submit">Ajouter</button>
+      </form>
+      <div id="liste-clients" class="list"></div>
+    </section>
+
+    <section id="page-defunts" class="page" style="display:none;">
+      <h2>Gestion des Défunts</h2>
+      <form id="form-defunt" class="form-grid">
+        <input id="nomDefunt" placeholder="Nom" required />
+        <input id="prenomDefunt" placeholder="Prénom" required />
+        <input id="dateNaissanceDefunt" type="date" placeholder="Date de naissance" required />
+        <input id="dateDeces" type="date" placeholder="Date du décès" required />
+        <input id="lieuDeces" placeholder="Lieu du décès" />
+        <input id="numSecuDefunt" placeholder="N° Sécurité sociale" />
+        <select id="clientLie" title="Client lié"></select>
+        <button class="btn-primary" type="submit">Ajouter</button>
+      </form>
+      <div id="liste-defunts" class="list"></div>
+    </section>
+
+    <section id="page-organismes" class="page" style="display:none;">
+      <h2>Organismes</h2>
+      <form id="form-ajout-organisme" class="form-grid">
+        <input id="nomNouvelOrganisme" placeholder="Nom de l’organisme" required />
+        <input id="docsNouvelOrganisme" placeholder="Documents requis (séparés par des virgules)" />
+        <button class="btn-primary" type="submit">Ajouter</button>
+      </form>
+      <div id="liste-organismes" class="list"></div>
+    </section>
+
+    <section id="page-dossier" class="page" style="display:none;">
+      <h2>Dossier Défunt</h2>
+      <div class="form-inline">
+        <label for="selectDefuntForDossier">Défunt :</label>
+        <select id="selectDefuntForDossier"></select>
+      </div>
+      <button id="btnOpenOrganismesModal" class="btn-primary">📄 Générer le dossier PDF</button>
+    </section>
+
+    <section id="page-parametres" class="page" style="display:none;">
+      <h2>Paramètres</h2>
+
+      <div class="panel">
+        <h3>Serveur backend</h3>
+        <div class="form-inline">
+          <input id="backendUrlInput" placeholder="URL du backend (ex: https://ton-service.onrender.com)" />
+          <button id="saveBackendUrl" class="btn-primary">Enregistrer</button>
+        </div>
+        <small>Le backend gère la fusion des données dans les .docx, la conversion en PDF et la fusion des PDF.</small>
+      </div>
+
+      <div class="panel">
+        <h3>Importer un modèle .docx</h3>
+        <div class="form-inline">
+          <input id="uploadTemplateName" placeholder="Nom Organisme (ex: Banque)" />
+          <input id="uploadTemplateFile" type="file" accept=".docx" />
+          <button id="btnUploadTemplate" class="btn-primary">Importer</button>
+        </div>
+        <div>
+          <h4>Modèles disponibles</h4>
+          <ul id="liste-templates" class="list-plain"></ul>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3>Balises disponibles (remplissage auto)</h3>
+        <ul id="liste-balises" class="list-plain">
+          <li>{{nomClient}}, {{prenomClient}}, {{dateNaissanceClient}}, {{adresseClient}}, {{telClient}}, {{emailClient}}, {{ribClient}}</li>
+          <li>{{nomDefunt}}, {{prenomDefunt}}, {{dateNaissanceDefunt}}, {{dateDecesDefunt}}, {{lieuDecesDefunt}}, {{numSecuDefunt}}</li>
+          <li>Alias rapides (défunt) : {{nom}}, {{prenom}}, {{dateDeces}}, {{lieuDeces}}</li>
+        </ul>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- Modal sélection organismes -->
+<div id="organismesModal" class="modal">
+  <div class="modal-content">
+    <span class="modal-close">&times;</span>
+    <h3>Choisissez les organismes à inclure</h3>
+    <div class="modal-body">
+      <div class="modal-col">
+        <div id="organismes-list" class="checklist"></div>
+      </div>
+      <div class="modal-col">
+        <h4>Aperçu des documents requis</h4>
+        <ul id="aperçu-docs" class="list-plain"></ul>
+      </div>
+    </div>
+    <button id="btnGenererPDF" class="btn-success">Générer le PDF fusionné</button>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
